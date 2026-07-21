@@ -3,8 +3,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+import requests
+
+from bs4 import BeautifulSoup
+
 import textstat
-from textstat import flesch_kincaid_grade
 
 import csv
 
@@ -45,18 +48,21 @@ sum_gunning_fog = 0
 sum_smog = 0
 
 for ref in urls:
-    driver.get(ref)
-    WebDriverWait(driver, 2).until(
-    EC.presence_of_all_elements_located((By.TAG_NAME, "p"))
-)
-    paras = driver.find_elements(by = By.TAG_NAME, value="p")
-    date_element = driver.find_element(by = By.TAG_NAME, value="time")
-    date = date_element.get_attribute("datetime")
-    text_paragraphs = []
-    for p in paras:
-        text_paragraphs.append(p.text)
+    page = requests.get(ref)
+    page.encoding = "utf-8"
 
-    text = "\n".join(text_paragraphs)
+
+    soup = BeautifulSoup(page.text, "html.parser")
+    article = soup.find("article")
+
+    paras = []
+    for p in article.select('[data-block="text"] p'):
+        paras.append(p.get_text())
+
+    text = "\n".join(paras)
+
+    f = open("article_text.txt", "a")
+    f.write(text)
 
     file = open(file_name, "a")
 
@@ -74,7 +80,7 @@ for ref in urls:
     sum_smog += smog
 
 
-    writer.writerow([ref, date, fkgl, fre,  dale_chall, gunning_fog, smog])
+    writer.writerow([ref, fkgl, fre,  dale_chall, gunning_fog, smog])
 
 avg_fkgl = sum_fkgl/len(urls)
 
