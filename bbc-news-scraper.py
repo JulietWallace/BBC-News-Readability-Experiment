@@ -9,6 +9,8 @@ from bs4 import BeautifulSoup
 
 import textstat
 
+import time
+
 import csv
 
 import datetime
@@ -61,9 +63,6 @@ for ref in urls:
 
     text = "\n".join(paras)
 
-    f = open("article_text.txt", "a")
-    f.write(text)
-
     file = open(file_name, "a")
 
     writer = csv.writer(file)
@@ -81,6 +80,7 @@ for ref in urls:
 
 
     writer.writerow([ref, fkgl, fre,  dale_chall, gunning_fog, smog])
+    time.sleep(0.5)
 
 avg_fkgl = sum_fkgl/len(urls)
 
