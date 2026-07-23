@@ -63,7 +63,9 @@ for ref in urls:
 
     text = "\n".join(paras)
 
-    file = open(file_name, "a")
+    date = datetime.datetime.now().strftime("%d-%m-%y")
+
+    file = open("./data/{date}-{file}".format(date=date, file=file_name), "a") #this saves the data from each day. timestamped so we know what day it is from.
 
     writer = csv.writer(file)
 
